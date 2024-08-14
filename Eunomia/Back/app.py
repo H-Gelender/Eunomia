@@ -15,7 +15,7 @@ def text_references():
     for index in range(len(ids)):
         text+=f"ID: {ids[index]}\nCode: {books[index]}\n\nDocument: {documents[index]}\n\n"
 
-    return(text)
+    return text
 
 # Titre de l'application
 def main():
@@ -24,7 +24,6 @@ def main():
 
     if 'eunomia' not in st.session_state:
 
-        load_dotenv(dotenv_path='environements.env')
         # Initialiser l'instance d'EunomiaGraph dans st.session_state pour la rendre persistante
         load_dotenv(dotenv_path='environements.env')
         Gllm = GoogleGenerativeAI(model="gemini-pro", temperature=0.1)
