@@ -6,3 +6,4 @@ langchain_google_genai
 langchain-core
 langgraph
 streamlit==1.13.0
+altair
