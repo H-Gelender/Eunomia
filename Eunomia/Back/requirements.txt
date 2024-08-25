@@ -5,5 +5,5 @@ langchain_huggingface
 langchain_google_genai
 langchain-core
 langgraph
-streamlit==1.13.0
+streamlit==1.24.1
 altair<4
