@@ -1,4 +1,4 @@
-FROM python:slim-bullseye 
+FROM python:3.9.19-slim-bullseye
 
 #Mise a jour de pip
 RUN python3 -m pip install --no-cache-dir --upgrade pip
