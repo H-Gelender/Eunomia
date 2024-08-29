@@ -1,0 +1,9 @@
+python-dotenv
+langchain_community
+langchain_pinecone
+langchain_huggingface
+langchain_google_genai
+langchain-core
+langgraph
+streamlit==1.24.1
+altair==4.0
