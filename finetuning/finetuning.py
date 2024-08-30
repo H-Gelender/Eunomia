@@ -115,75 +115,144 @@ class PreprocessDatasetLegalkitShareGPT:
         }
 
 class ModelParser:
-    """
-    A class to manage and modify the trainability of layers in a machine learning model.
-    
-    Attributes
-    ----------
-    model : torch.nn.Module or transformers.PreTrainedModel
-        The model whose parameters will be analyzed and modified.
-    """
-
     def __init__(self, model):
         """
-        Initialize the class with the given model.
+        Initialize the class with a given model.
 
         Parameters
         ----------
-        model : torch.nn.Module or transformers.PreTrainedModel
-            The model to be processed (e.g., a PyTorch model or a Hugging Face model).
+        model : object
+            The model (e.g., a PyTorch or Hugging Face model).
         """
         self.model = model
 
     def count_parameters(self):
         """
         Count and display the total number of parameters in the model, 
-        along with the number of trainable parameters.
-        Also, display the percentage of trainable parameters relative to the total number.
+        as well as the number of trainable parameters. 
+        Also displays the percentage of trainable parameters relative to 
+        the total number of parameters.
+
+        Returns
+        -------
+        None
         """
         total_params = sum(p.numel() for p in self.model.parameters())
         trainable_params = sum(p.numel() for p in self.model.parameters() if p.requires_grad)
         trainable_percentage = (trainable_params / total_params) * 100
 
-        # Format the numbers with thousands separators
+        # Format numbers with thousand separators
         total_params_str = f"{total_params:,}".replace(",", " ")
         trainable_params_str = f"{trainable_params:,}".replace(",", " ")
 
         print(f"Total parameters: {total_params_str}")
         print(f"Trainable parameters: {trainable_params_str} ({trainable_percentage:.2f}%)\n")
 
-    def freeze_layers_by_param_count(self, max_trainable_params: int):
+    def freeze_layers_by_param_count(self, max_trainable_params):
         """
-        Freeze layers in the model until the maximum number of trainable parameters is reached.
+        Freeze the layers of the model until the maximum number of trainable 
+        parameters is reached.
 
         Parameters
         ----------
         max_trainable_params : int
-            The desired maximum number of trainable parameters.
+            The maximum number of trainable parameters desired.
+
+        Returns
+        -------
+        None
         """
         current_trainable_params = 0
 
-        # Iterate through the model's layers
+        # Iterate through the layers of the model
         for param in self.model.parameters():
             if current_trainable_params + param.numel() > max_trainable_params:
                 param.requires_grad = False
             else:
                 current_trainable_params += param.numel()
 
-        print(f"Final trainable parameters: {self.count_parameters()}")
+        print(f"Final trainable parameters: {self.count_parameters}")
 
-    def freeze_layers_by_name(self, layer_names: list):
+    def freeze_layers_by_name(self, layer_names):
         """
         Freeze the layers of the model based on the provided layer names.
 
         Parameters
         ----------
-        layer_names : list
+        layer_names : list of str
             A list of layer names to freeze.
+
+        Returns
+        -------
+        None
         """
         for name, param in self.model.named_parameters():
             if any(layer_name in name for layer_name in layer_names):
                 param.requires_grad = False
+
+        print(f"Layers frozen: {layer_names}")
+
+    def freeze_all_except_layer(self, layer_name_to_keep):
+        """
+        Freeze all layers of the model except for the one specified by its name.
+
+        Parameters
+        ----------
+        layer_name_to_keep : str
+            The name of the layer to keep unfrozen.
+
+        Returns
+        -------
+        None
+        """
+        for name, param in self.model.named_parameters():
+            if layer_name_to_keep not in name:
+                param.requires_grad = False
+            else:
+                param.requires_grad = True
+
+        print(f"All layers frozen except: {layer_name_to_keep}")
+
+    def train_specific_layers(self, layer_names):
+        """
+        Freeze the layers of the model based on the provided layer names, while 
+        keeping the specified layers trainable.
+
+        Parameters
+        ----------
+        layer_names : list of str
+            A list of layer names to keep trainable.
+
+        Returns
+        -------
+        None
+        """
+        for name, param in self.model.named_parameters():
+            if any(layer_name in name for layer_name in layer_names):
+                param.requires_grad = True
+                print(f"Layer frozen: {name}")
+            else:
+                param.requires_grad = False
+
+    def train_lm_head(self):
+        """
+        Freeze all parameters except for the lm_head layer.
+
+        Returns
+        -------
+        None
+        """
+        for param in self.model.parameters():
+            param.requires_grad = False
+
+        if hasattr(self.model, 'lm_head'):
+            for param in self.model.lm_head.parameters():
+                param.requires_grad = True
+            print("lm_head has been frozen.")
+        else:
+            print("No lm_head found in the model.")
+
+        self.count_parameters()
 
        
 
