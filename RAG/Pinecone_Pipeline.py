@@ -1,6 +1,5 @@
 from datasets import load_dataset
 import pandas as pd
-from langchain_google_genai import GoogleGenerativeAI
 from pinecone import Pinecone
 from llama_index.core import Document
 from llama_index.core.ingestion import IngestionPipeline
